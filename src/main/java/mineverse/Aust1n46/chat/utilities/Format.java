@@ -438,7 +438,7 @@ public class Format {
 		} else {
 			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
 			container.getStrings().write(0, json);
-			container.getIntegers().write(0, 1);
+			container.getBooleans().write(0, false);
 		}
 		return container;
 	}
@@ -452,7 +452,7 @@ public class Format {
 		} else {
 			container = new PacketContainer(PacketType.Play.Server.SYSTEM_CHAT);
 			container.getStrings().write(0, component.getJson());
-			container.getIntegers().write(0, 1);
+			container.getBooleans().write(0, false);
 		}
 		return container;
 	}

@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  push:
+    paths:
+      - "pom.xml"
+
+jobs:
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+      - name: Set up JDK 8
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Generate release diff
+        run: git fetch --tags --force && git log --pretty=format:"* %s (%h)" ${{ github.event.before }}..${{ github.event.after }} > release_notes.md
+      - uses: mikefarah/yq@v4.26.1
+        id: getPluginVersion
+        with:
+          cmd: yq -p xml '.project.version' 'pom.xml'
+      - name: Build VentureChat
+        run: mvn -B package -T 2C
+      - name: Rename Jar
+        run: mv target/VentureChat-*.jar target/VentureChat.jar
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+            artifacts: target/VentureChat.jar
+            allowUpdates: true
+            bodyFile: "release_notes.md"
+            draft: false
+            prerelease: false
+            tag: ${{ steps.getPluginVersion.outputs.result }}
+            token: ${{ secrets.GITHUB_TOKEN }}
