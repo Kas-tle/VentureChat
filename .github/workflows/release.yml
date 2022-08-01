@@ -13,10 +13,10 @@ jobs:
       - uses: actions/checkout@v2
         with:
             fetch-depth: 0
-      - name: Set up JDK 8
+      - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 17
       - name: Generate release diff
         run: git fetch --tags --force && git log --pretty=format:"* %s (%h)" ${{ github.event.before }}..${{ github.event.after }} > release_notes.md
       - uses: mikefarah/yq@v4.26.1
@@ -24,7 +24,7 @@ jobs:
         with:
           cmd: yq -p xml '.project.version' 'pom.xml'
       - name: Build VentureChat
-        run: mvn -B package -T 2C
+        run: mvn clean package
       - name: Rename Jar
         run: mv target/VentureChat-*.jar target/VentureChat.jar
       - name: Create release
